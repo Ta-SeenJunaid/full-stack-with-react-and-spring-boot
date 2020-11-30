@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import './Counter.css'
 
 class Counter extends Component {
@@ -12,22 +13,61 @@ class Counter extends Component {
         this.increment = this.increment.bind(this)
     }
 
-    increment(){
-        this.setState({
-            counter: this.state.counter +1
+    increment(by){
+        this.setState(
+            (prevState) => {
+            return {counter: prevState.counter + by}
         })
+    }
+
+    render() {
+        return (
+            <div className="App">
+              <CounterButton incrementMethod={this.increment}/>
+              <CounterButton by={+5} incrementMethod={this.increment}/>
+              <CounterButton by={-5} incrementMethod={this.increment}/>
+              <span className="count">{this.state.counter}</span> 
+            </div>
+          )
+    }
+}
+
+class CounterButton extends Component {
+
+    constructor(){
+        super()
+        // this.state = {
+        //     counter : 0
+        // }
+
+        this.increment = this.increment.bind(this)
+    }
+
+    increment(){
+        // this.setState({
+        //     counter: this.state.counter + this.props.by
+        // })
+
+        this.props.incrementMethod(this.props.by);
     }
 
     render(){
         return (
             <div className="counter">
-               <button onClick={this.increment} > +1</button>
-               <span className="count">{this.state.counter}</span> 
+               <button onClick={this.increment} > {this.props.by}</button>
             </div>
         )
     }
 }
 
+
+CounterButton.defaultProps = {
+    by : 1
+}
+
+CounterButton.propTypes = {
+    by : PropTypes.number
+}
 
 
 export default Counter
