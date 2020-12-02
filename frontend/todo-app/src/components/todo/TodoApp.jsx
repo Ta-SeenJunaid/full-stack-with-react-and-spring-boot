@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import {BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom'
-import AuthenticationService from './AuthenticationService'
+import AuthenticationService from './AuthenticationService.js'
+import AuthenticatedRoute from './AuthenticatedRoute.jsx'
 
 class TodoApp extends Component {
     render() {
@@ -8,22 +9,18 @@ class TodoApp extends Component {
             <div className="TodoApp">
                 <Router>
                     <>
-                        <HeaderComponent />
+                        <HeaderComponent/>
                         <Switch>
-                            <Route path="/" exact component={LoginComponent} />
-                            <Route path="/login" component={LoginComponent} />
-                            <Route path="/welcome/:name" component={WelcomeComponent} />
-                            <Route path="/welcome/:name" component={WelcomeComponent} />
-                            <Route path="/todos" component={ListTodosComponent} />
-                            <Route path="/logout" component={LogoutComponent} />
-                            <Route component={ErrorComponent} />
+                            <Route path="/" exact component={LoginComponent}/>
+                            <Route path="/login" component={LoginComponent}/>
+                            <AuthenticatedRoute path="/welcome/:name" component={WelcomeComponent}/>
+                            <AuthenticatedRoute path="/todos" component={ListTodosComponent}/>
+                            <AuthenticatedRoute path="/logout" component={LogoutComponent}/>
+                            <Route component={ErrorComponent}/>
                         </Switch>
-                        <FooterComponent />
+                        <FooterComponent/>
                     </>
                 </Router>
-
-                {/* <LoginComponent />
-                <WelcomeComponent /> */}
             </div>
         )
     }
@@ -34,7 +31,7 @@ class WelcomeComponent extends Component{
         return (
             <>
                 <h1>Welcome!</h1>
-                <div class="container">
+                <div className="container">
                     Welcome {this.props.match.params.name}.
                     You can manage your todos <Link to="/todos">here</Link>. 
                 </div>
@@ -45,17 +42,18 @@ class WelcomeComponent extends Component{
 
 class HeaderComponent extends Component {
     render() {
+        const isUserLoggedIn = AuthenticationService.isUserLoggedIn()
         return (
             <header>
                 <nav className="navbar navbar-expand-md navbar-dark bg-dark">
                     <div><a href="https://reactjs.org/" className="navbar-brand">ReactJs Learning</a></div>
                     <ul className="navbar-nav">
-                        <li><Link className="nav-link" to="/welcome/dummy">Home</Link></li>
-                        <li><Link className="nav-link" to="/todos">Todos</Link></li>
+                        {isUserLoggedIn && <li><Link className="nav-link" to="/welcome/dummy">Home</Link></li>}
+                        {isUserLoggedIn && <li><Link className="nav-link" to="/todos">Todos</Link></li>}
                     </ul>
                     <ul className="navbar-nav navbar-collapse justify-content-end">
-                        <li><Link  className="nav-link" to="/login"> Login</Link></li>
-                        <li><Link  className="nav-link" to="/logout">Logout</Link></li>
+                        {!isUserLoggedIn && <li><Link  className="nav-link" to="/login"> Login</Link></li>}
+                        {isUserLoggedIn && <li><Link  className="nav-link" to="/logout" onClick={AuthenticationService.logout}>Logout</Link></li>}
                     </ul>
                 </nav>
             </header>
@@ -102,11 +100,11 @@ class ListTodosComponent extends Component{
         return(
             <div>
                 <h1>List Todos</h1>
-                <div class="container">
-                    <table class="table">
+                <div className="container">
+                    <table className="table">
                         <thead>
                             <tr>
-                                <th>description</th>
+                                <th>Description</th>
                                 <th>Target Date</th>
                                 <th>Is Completed</th>
                             </tr>
@@ -115,7 +113,7 @@ class ListTodosComponent extends Component{
                             {
                                 this.state.todos.map (
                                     todo =>
-                                    <tr>
+                                    <tr key={todo.id}>
                                         <td>{todo.description}</td>
                                         <td>{todo.done.toString()}</td>
                                         <td>{todo.targetDate.toString()}</td>
@@ -125,7 +123,6 @@ class ListTodosComponent extends Component{
                         </tbody>
                     </table>
                 </div>
-
             </div>
         ) 
     }
@@ -178,6 +175,7 @@ class LoginComponent extends Component {
     loginClicked() {
         console.log(this.state)
         if(this.state.username==='dummy' && this.state.password === "123" ){
+            AuthenticationService.registerSuccessfulLogin(this.state.username, this.state.password)
             this.props.history.push(`/welcome/${this.state.username}`)
             // this.setState({showSuccessMessage:true})
             // this.setState({hasLoginFailed: false})
@@ -192,6 +190,7 @@ class LoginComponent extends Component {
     render(){
         return(
             <div>
+                <h1>Login</h1>
                 <div className="container">
                     {this.state.hasLoginFailed && <div className="alert alert-warning">Invalid Credentials</div>}
                     {this.state.showSuccessMessage && <div>Login Sucessful</div> }
