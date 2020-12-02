@@ -3,6 +3,7 @@ import './App.css';
 import { Component } from 'react';
 import Counter from './components/counter/Counter';
 import TodoApp from './components/todo/TodoApp';
+import './bootstrap.css';
 
 
 function App() {
