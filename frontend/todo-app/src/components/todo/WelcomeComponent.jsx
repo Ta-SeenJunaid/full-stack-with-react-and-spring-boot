@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import {Link} from 'react-router-dom'
+import HelloWorldService from '../../api/todo/HelloWorldService'
 
 
 class WelcomeComponent extends Component{
@@ -9,7 +10,9 @@ class WelcomeComponent extends Component{
     }
 
     retrieveWelcomeMessage() {
-        console.log('retrieve clicked')
+        HelloWorldService.executeHelloWorldService()
+        .then( response => console.log(response) )
+        .catch(console.log("Failed to get the response"))
     }
     
     render() {
