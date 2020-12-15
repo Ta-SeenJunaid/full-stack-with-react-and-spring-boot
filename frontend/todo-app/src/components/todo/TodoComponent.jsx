@@ -4,6 +4,7 @@ import { ErrorMessage, Field, Form, Formik } from 'formik'
 import TodoDataService from '../../api/todo/TodoDataService'
 import AuthenticationService from './AuthenticationService.js'
 
+
 class TodoComponent extends Component {
     
     constructor(props) {
@@ -35,6 +36,13 @@ class TodoComponent extends Component {
     }
 
     onSubmit(values){
+        let username = AuthenticationService.getLoggedInUserName()
+
+        TodoDataService.updateTodo(username, this.state.id, {
+            id: this.state.id,
+            description: values.description,
+            targetDate: values.targetDate
+        })
         console.log(values)
     }
     
