@@ -17,6 +17,10 @@ class TodoDataService {
     updateTodo(name, id, todo) {
         return axios.put(`http://localhost:8080/users/${name}/todos/${id}`, todo)
     }
+
+    createTodo(name, id, todo) {
+        return axios.post(`http://localhost:8080/users/${name}/todos/`, todo)
+    }
 }
 
 export default new TodoDataService()

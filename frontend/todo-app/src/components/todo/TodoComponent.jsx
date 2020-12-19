@@ -12,7 +12,7 @@ class TodoComponent extends Component {
     
         this.state = {
              id : this.props.match.params.id,
-             description : 'Learn Forms',
+             description : '',
              targetDate : moment(new Date()).format('YYYY-MM-DD')
         }
 
@@ -38,15 +38,34 @@ class TodoComponent extends Component {
     onSubmit(values){
         let username = AuthenticationService.getLoggedInUserName()
 
-        TodoDataService.updateTodo(username, this.state.id, {
+        let todo = {
             id: this.state.id,
             description: values.description,
             targetDate: values.targetDate
-        })
+        }
+
+        if(this.state.id === -1){
+            TodoDataService.createTodo(username, todo).then(
+                () => {
+                    this.props.history.push('/todos')
+                }
+            )
+        } else {
+            TodoDataService.updateTodo(username, this.state.id, todo).then(
+                () => {
+                    this.props.history.push('/todos')
+                }
+            )
+        }
         console.log(values)
     }
     
     componentDidMount(){
+
+        if(this.state.id===-1) {
+            return
+        }
+
         let username = AuthenticationService.getLoggedInUserName()
         TodoDataService.retrieveTodo(username, this.state.id)
         .then(response => this.setState({
